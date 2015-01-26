@@ -30,11 +30,11 @@ import java.util.Locale;
  * @author Tom Denley
  *
  */
-public final class NonBlockingStatsDClient extends ConvenienceMethodProvidingStatsDClient {
+public class NonBlockingStatsDClient extends ConvenienceMethodProvidingStatsDClient {
 
     private static final Charset STATS_D_ENCODING = Charset.forName("UTF-8");
 
-    private static final StatsDClientErrorHandler NO_OP_HANDLER = new StatsDClientErrorHandler() {
+    protected static final StatsDClientErrorHandler NO_OP_HANDLER = new StatsDClientErrorHandler() {
         @Override public void handle(Exception e) { /* No-op */ }
     };
 
@@ -193,11 +193,11 @@ public final class NonBlockingStatsDClient extends ConvenienceMethodProvidingSta
         send(messageFor(aspect, Long.toString(timeInMs), "ms", sampleRate));
     }
 
-    private String messageFor(String aspect, String value, String type) {
+    protected String messageFor(String aspect, String value, String type) {
         return messageFor(aspect, value, type, 1.0);
     }
 
-    private String messageFor(String aspect, String value, String type, double sampleRate) {
+    protected String messageFor(String aspect, String value, String type, double sampleRate) {
         final String messageFormat = (sampleRate == 1.0) ? "%s%s:%s|%s" : "%s%s:%s|%s@%f";
         return String.format((Locale)null, messageFormat, prefix, aspect, value, type, sampleRate);
     }
