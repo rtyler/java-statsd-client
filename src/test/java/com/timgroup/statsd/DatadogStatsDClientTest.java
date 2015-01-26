@@ -43,5 +43,39 @@ public final class DatadogStatsDClientTest {
 
         assertThat(message, equalTo("my.prefix.foo.var:1|c|#partition:2"));
     }
+
+    @Test(timeout=5000L) public void
+    sends_counter_value_to_statsd() throws Exception {
+        ArrayList tags = new ArrayList();
+        tags.add("junit");
+
+        client.count("mycount", Long.MAX_VALUE, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mycount:9223372036854775807|c|#junit"));
+    }
+
+    @Test(timeout=5000L) public void
+    sends_counter_value_with_rate_to_statsd() throws Exception {
+        ArrayList tags = new ArrayList();
+        tags.add("junit");
+
+        client.count("mycount", Long.MAX_VALUE, tags, 0.00024);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mycount:9223372036854775807|c@0.000240|#junit"));
+    }
+
+    @Test(timeout=5000L) public void
+    sends_counter_value_to_statsd_with_tagvalues() throws Exception {
+        HashMap<String, String> tags = new HashMap<>();
+        tags.put("cluster-id", "1");
+
+        client.count("mycount", Long.MAX_VALUE, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mycount:9223372036854775807|c|#cluster-id:1"));
+    }
+
 }
 

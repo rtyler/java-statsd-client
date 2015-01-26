@@ -15,6 +15,26 @@ public class NonBlockingDogStatsDClient extends NonBlockingStatsDClient {
         super(prefix, hostname, port, NO_OP_HANDLER);
     }
 
+
+    public void count(String aspect, long delta, AbstractList tags) {
+        count(aspect, delta, tags, 1.0);
+    }
+
+    public void count(String aspect, long delta, AbstractList tags, double sampleRate) {
+        send(messageFor(aspect, Long.toString(delta), "c", tags, sampleRate));
+    }
+
+    public void count(String aspect, long delta, AbstractMap<String, String> tags) {
+        count(aspect, delta, tags, 1.0);
+    }
+
+    public void count(String aspect, long delta, AbstractMap<String, String> tags, double sampleRate) {
+        send(messageFor(aspect, Long.toString(delta), "c", tags, sampleRate));
+    }
+
+
+
+
     protected String messageFor(String aspect, String value, String type, AbstractList tags) {
         return messageFor(aspect, value, type, tags, 1.0);
     }

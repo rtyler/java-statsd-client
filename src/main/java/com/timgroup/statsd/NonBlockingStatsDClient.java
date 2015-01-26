@@ -202,7 +202,7 @@ public class NonBlockingStatsDClient extends ConvenienceMethodProvidingStatsDCli
         return String.format((Locale)null, messageFormat, prefix, aspect, value, type, sampleRate);
     }
 
-    private void send(final String message) {
+    protected void send(final String message) {
         sender.send(message);
     }
 
