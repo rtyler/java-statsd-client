@@ -1,7 +1,10 @@
 package com.timgroup.statsd;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.AbstractMap;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 /**
  * A simple StatsD client which implements some extensions to the StatsD
@@ -20,5 +23,18 @@ public class NonBlockingDogStatsDClient extends NonBlockingStatsDClient {
         String commaSeparatedTags = String.join(",", tags);
 
         return String.format((Locale)null, "%s|#%s", messageFor(aspect, value, type, sampleRate), commaSeparatedTags);
+    }
+
+    protected String messageFor(String aspect, String value, String type, AbstractMap<String, String> tags) {
+        return messageFor(aspect, value, type, tags, 1.0);
+    }
+
+    protected String messageFor(String aspect, String value, String type, AbstractMap<String, String> tags, double sampleRate) {
+        ArrayList tagValues = new ArrayList();
+        for (Entry<String, String> entry : tags.entrySet()) {
+            tagValues.add(String.format((Locale)null, "%s:%s", entry.getKey(), entry.getValue()));
+        }
+
+        return messageFor(aspect, value, type, tagValues, sampleRate);
     }
 }
