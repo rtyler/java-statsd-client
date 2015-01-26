@@ -12,7 +12,7 @@ import org.junit.Test;
 
 public final class DatadogStatsDClientTest {
 
-    private static final int STATSD_SERVER_PORT = 17254;
+    private static final int STATSD_SERVER_PORT = 17255;
 
     private final NonBlockingDogStatsDClient client = new NonBlockingDogStatsDClient("my.prefix", "localhost", STATSD_SERVER_PORT);
     private final DummyStatsDServer server = new DummyStatsDServer(STATSD_SERVER_PORT);
@@ -77,5 +77,48 @@ public final class DatadogStatsDClientTest {
         assertThat(server.messagesReceived(), contains("my.prefix.mycount:9223372036854775807|c|#cluster-id:1"));
     }
 
+    @Test(timeout=5000L) public void
+    sends_gauge_to_statsd() throws Exception {
+        ArrayList tags = new ArrayList();
+        tags.add("junit");
+
+        client.recordGaugeValue("mygauge", Long.MAX_VALUE, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mygauge:9223372036854775807|g|#junit"));
+    }
+
+    @Test(timeout=5000L) public void
+    sends_gauge_to_statsd_with_tagvalues() throws Exception {
+        HashMap<String, String> tags = new HashMap<>();
+        tags.put("cluster-id", "1");
+
+        client.recordGaugeValue("mygauge", Long.MAX_VALUE, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mygauge:9223372036854775807|g|#cluster-id:1"));
+    }
+
+    @Test(timeout=5000L) public void
+    sends_gauge_positive_delta_to_statsd() throws Exception {
+        ArrayList tags = new ArrayList();
+        tags.add("junit");
+
+        client.recordGaugeDelta("mygauge", 423L, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mygauge:+423|g|#junit"));
+    }
+
+    @Test(timeout=5000L) public void
+    sends_gauge_positive_delta_to_statsd_with_tagvalues() throws Exception {
+        HashMap<String, String> tags = new HashMap<>();
+        tags.put("cluster-id", "1");
+
+        client.recordGaugeDelta("mygauge", 423L, tags);
+        server.waitForMessage();
+
+        assertThat(server.messagesReceived(), contains("my.prefix.mygauge:+423|g|#cluster-id:1"));
+    }
 }
 

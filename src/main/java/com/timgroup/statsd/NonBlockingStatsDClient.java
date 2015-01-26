@@ -135,31 +135,31 @@ public class NonBlockingStatsDClient extends ConvenienceMethodProvidingStatsDCli
      */
     @Override
     public void recordGaugeValue(String aspect, long value) {
-        recordGaugeCommon(aspect, Long.toString(value), value < 0, false);
+        send(recordGaugeCommon(aspect, Long.toString(value), value < 0, false));
     }
 
     @Override
     public void recordGaugeValue(String aspect, double value) {
-        recordGaugeCommon(aspect, stringValueOf(value), value < 0, false);
+        send(recordGaugeCommon(aspect, stringValueOf(value), value < 0, false));
     }
 
     @Override
     public void recordGaugeDelta(String aspect, long value) {
-        recordGaugeCommon(aspect, Long.toString(value), value < 0, true);
+        send(recordGaugeCommon(aspect, Long.toString(value), value < 0, true));
     }
 
     @Override
     public void recordGaugeDelta(String aspect, double value) {
-        recordGaugeCommon(aspect, stringValueOf(value), value < 0, true);
+        send(recordGaugeCommon(aspect, stringValueOf(value), value < 0, true));
     }
 
-    private void recordGaugeCommon(String aspect, String value, boolean negative, boolean delta) {
+    protected String recordGaugeCommon(String aspect, String value, boolean negative, boolean delta) {
         final StringBuilder message = new StringBuilder();
         if (!delta && negative) {
             message.append(messageFor(aspect, "0", "g")).append('\n');
         }
         message.append(messageFor(aspect, (delta && !negative) ? ("+" + value) : value, "g"));
-        send(message.toString());
+        return message.toString();
     }
 
     /**

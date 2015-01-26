@@ -33,7 +33,28 @@ public class NonBlockingDogStatsDClient extends NonBlockingStatsDClient {
     }
 
 
+    public void recordGaugeValue(String aspect, long value, AbstractList tags) {
+        sendGaugeWithTags(recordGaugeCommon(aspect, Long.toString(value), value < 0, false), tags);
+    }
 
+    public void recordGaugeValue(String aspect, long value, AbstractMap<String, String> tags) {
+        String gauge = recordGaugeCommon(aspect, Long.toString(value), value < 0, false);
+        sendGaugeWithTags(gauge, commaSeparatedTagValues(tags));
+    }
+
+    public void recordGaugeDelta(String aspect, long value, AbstractList tags) {
+        sendGaugeWithTags(recordGaugeCommon(aspect, Long.toString(value), value < 0, true), tags);
+    }
+
+    public void recordGaugeDelta(String aspect, long value, AbstractMap<String, String> tags) {
+        String gauge = recordGaugeCommon(aspect, Long.toString(value), value < 0, true);
+        sendGaugeWithTags(gauge, commaSeparatedTagValues(tags));
+    }
+
+
+    protected void sendGaugeWithTags(String gauge, AbstractList tags) {
+        send(String.format((Locale)null, "%s|#%s", gauge, String.join(",", tags)));
+    }
 
     protected String messageFor(String aspect, String value, String type, AbstractList tags) {
         return messageFor(aspect, value, type, tags, 1.0);
@@ -50,11 +71,17 @@ public class NonBlockingDogStatsDClient extends NonBlockingStatsDClient {
     }
 
     protected String messageFor(String aspect, String value, String type, AbstractMap<String, String> tags, double sampleRate) {
+
+        return messageFor(aspect, value, type, commaSeparatedTagValues(tags), sampleRate);
+    }
+
+
+    private ArrayList commaSeparatedTagValues(AbstractMap<String, String> tags) {
         ArrayList tagValues = new ArrayList();
         for (Entry<String, String> entry : tags.entrySet()) {
             tagValues.add(String.format((Locale)null, "%s:%s", entry.getKey(), entry.getValue()));
         }
 
-        return messageFor(aspect, value, type, tagValues, sampleRate);
+        return tagValues;
     }
 }
