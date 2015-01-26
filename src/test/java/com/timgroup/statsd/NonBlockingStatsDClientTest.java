@@ -36,7 +36,7 @@ public final class NonBlockingStatsDClientTest {
     sends_counter_value_to_statsd() throws Exception {
         client.count("mycount", Long.MAX_VALUE);
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.mycount:9223372036854775807|c"));
     }
 
@@ -52,7 +52,7 @@ public final class NonBlockingStatsDClientTest {
     sends_counter_increment_to_statsd() throws Exception {
         client.incrementCounter("myinc");
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.myinc:1|c"));
     }
 
@@ -60,7 +60,7 @@ public final class NonBlockingStatsDClientTest {
     sends_counter_decrement_to_statsd() throws Exception {
         client.decrementCounter("mydec");
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.mydec:-1|c"));
     }
 
@@ -68,7 +68,7 @@ public final class NonBlockingStatsDClientTest {
     sends_gauge_to_statsd() throws Exception {
         client.recordGaugeValue("mygauge", Long.MAX_VALUE);
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.mygauge:9223372036854775807|g"));
     }
 
@@ -132,7 +132,7 @@ public final class NonBlockingStatsDClientTest {
     sends_set_to_statsd() throws Exception {
         client.recordSetEvent("myset", "test");
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.myset:test|s"));
     }
 
@@ -140,7 +140,7 @@ public final class NonBlockingStatsDClientTest {
     sends_timer_to_statsd() throws Exception {
         client.recordExecutionTime("mytime", 123L);
         server.waitForMessage();
-        
+
         assertThat(server.messagesReceived(), contains("my.prefix.mytime:123|ms"));
     }
 
