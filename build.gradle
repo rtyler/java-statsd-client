@@ -1,4 +1,9 @@
+plugins {
+    id 'com.jfrog.bintray' version '1.0'
+}
+
 apply plugin: 'java'
+apply plugin: 'maven'
 
 version = '3.1.0'
 group = 'com.timgroup'
@@ -29,5 +34,33 @@ dependencies {
     testCompile 'junit:junit:4.12+'
     testCompile 'org.hamcrest:hamcrest-junit:1.0.0.0+'
 }
+//
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  RELEASING
+////////////////////////////////////////////////////////////////////////////////
+bintray {
+    user = project.bintrayUser
+    key = project.bintrayKey
+    publish = true
+    dryRun = false
+    configurations = ['archives']
+
+    pkg {
+        userOrg = 'rtyler'
+        repo = 'maven'
+        name = 'java-statsd-client'
+        labels = ['java', 'statsd']
+
+        version {
+            name = project.version
+            vcsTag = "v${project.version}"
+            desc = project.description
+        }
+    }
+}
+bintrayUpload.dependsOn assemble
 //
 ////////////////////////////////////////////////////////////////////////////////
